@@ -1,0 +1,63 @@
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+#include <DHT.h>
+//定义针脚
+
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+
+#define OLED_RESET     13 // 重置引脚
+#define SCREEN_ADDRESS 0x3C // OLED 显示屏的地址，固化在芯片上
+#define DHTPIN 8 
+//定义类型，DHT11或者其它
+#define DHTTYPE DHT11
+//进行初始设置 
+
+DHT dht(DHTPIN, DHTTYPE);
+ 
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET); // 创建实例
+
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+  dht.begin(); //DHT开始工作
+
+  // SSD1306_SWITCHCAPVCC = 内部提供 3.3V 显示电压
+  if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
+    Serial.println(F("SSD1306 allocation failed"));
+    for(;;); // Don't proceed, loop forever
+  }
+  display.clearDisplay(); // 清屏
+  delay(1000); // 延时 1s
+
+  display.setTextColor(WHITE); // 设置字体颜色为白色
+  display.display(); // 显示
+
+
+}
+
+void loop() {
+
+
+
+  // put your main code here, to run repeatedly:
+  display.setTextSize(2); // 设置字体大小
+  display.setCursor(10,25); // 设置显示起始位置，根据屏幕大小自己计算
+  //display.print("Hello"); // 输出 Hello 字样
+   // 两次检测之间，要等几秒钟，这个传感器有点慢。
+  delay(2500);
+  // 读温度或湿度要用250毫秒
+  float h = dht.readHumidity();//读湿度
+  float t = dht.readTemperature();//读温度，默认为摄氏度
+  display.print("H: ");//湿度
+  display.println(h);
+  display.print(" T: ");//温度
+  display.print(t);
+  
+  display.display(); // 显示
+  display.clearDisplay(); // 刷新
+}
+
+
+//用到的库有“Adafruit GFX” 和 “Adafruit SSD1306”以及自配库
